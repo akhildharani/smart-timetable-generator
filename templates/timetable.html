@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+
+{% for section in sections %}
+
+<h2 class="secHead">{{ section.section_id }} ({{ section.department }})</h2>
+<table class="table2">
+  <colgroup>
+    <col span="1" style="width: 10%;"> <!-- Weekdays Column -->
+    <!-- Assume each period spans roughly the same time, adjust the width accordingly -->
+    <col span="6" style="width: 15%;"> <!-- Periods Columns -->
+  </colgroup>
+  <tr>
+    <th>Day / Time</th>
+    <!-- Adjust the timings as per your actual class timings -->
+    <th>9:30 - 10:30</th>
+    <th>10:30 - 11:30</th>
+    <th>11:30 - 12:30</th>
+    <!-- <th>12:30 - 1:30</th>
+    <th>2:30 - 3:30</th>
+    <th>3:30 - 4:30</th> -->
+  </tr>
+
+  <!-- Assuming 'schedule' is a list of class objects with attributes like 'day' and 'time' -->
+  {% for day in weekdays %}
+  <tr>
+    <td>{{day}}</td>
+    {%for time in times%}
+      <td> 
+          {% for class in schedule %}
+          {% if class.meeting_time.time == time  %}
+            {% if class.meeting_time.day == day  %}
+              {% if class.section == section.section_id %}
+                {{class.course}}
+                {{class.instructor}}
+              {% endif %} 
+            {% endif %} 
+          {% endif %} 
+        {% endfor %}
+      </td>
+    {%endfor%}
+    {% comment %} Hey GPT write a for loop here which traverses through different timeslots in a day(refer the <th> tags above) {% endcomment %}
+    </tr>  
+  {% endfor %}
+</table>
+
+{% endfor %}
+
+  <form action="{% url 'export_sections_to_excel' %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class='excel'>Export to Excel</button>
+  </form>
+
+
+{% endblock %}

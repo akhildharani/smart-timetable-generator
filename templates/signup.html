@@ -1,0 +1,250 @@
+<html lang="en">
+<head>
+    <title>Signup Page</title>
+ 
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style media="screen">
+      *,
+*:before,
+*:after{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: #080710;
+}
+form{
+    height: 600px;
+    width: 450px;
+    background-color: rgba(255,255,255,0.13);
+    position: absolute;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 40px rgba(8,7,16,0.6);
+    padding: 50px 35px;
+}
+form *{
+    font-family: 'Poppins',sans-serif;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    outline: none;
+    border: none;
+}
+form h3{
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 42px;
+    text-align: center;
+}
+
+label{
+    display: block;
+    margin-top: 30px;
+    font-size: 16px;
+    font-weight: 500;
+}
+input{
+    display: block;
+    height: 40px;
+    width: 100%;
+    background-color: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    padding: 0 10px;
+    margin-top: 2px;
+    font-size: 14px;
+    font-weight: 300;
+}
+::placeholder{
+    color: #e5e5e5;
+}
+button{
+    margin-top: 14px;
+    width: 100%;
+    background-color: #ffffff;
+    color: #080710;
+    padding: 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.social{
+  margin-top: 30px;
+  display: flex;
+}
+.social div{
+  background: red;
+  width: 150px;
+  border-radius: 3px;
+  padding: 5px 10px 10px 5px;
+  background-color: rgba(255,255,255,0.27);
+  color: #eaf0fb;
+  text-align: center;
+}
+.social div:hover{
+  background-color: rgba(255,255,255,0.47);
+}
+.social .fb{
+  margin-left: 25px;
+}
+.social i{
+  margin-right: 4px;
+}
+.password-container {
+    position: relative;
+}
+
+#password, #password2 {
+    padding-right: 30px;
+}
+
+#togglePassword, #togglePassword2 {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+    </style>
+
+
+
+</head>
+<body>
+    <form id="signupForm" method="post">
+        {% csrf_token %} 
+        <h3>Signup</h3>
+
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" placeholder="Enter username"><br>
+            <label for="password">Password:</label>
+            <div class="password-container">
+                <input type="password" id="password" name="password" placeholder="Enter password">
+                <i id="togglePassword" class="fa fa-eye-slash" aria-hidden="true"></i>
+            </div>
+
+            <label for="password2">Password:</label>
+            <div class="password-container">
+                <input type="password" id="password2" name="password2" placeholder="Confirm password">
+                <i id="togglePassword2" class="fa fa-eye-slash" aria-hidden="true"></i>
+            </div>
+            
+            <button type="submit">Sign up</button>
+
+            <br><br><br>
+        
+        <a href="{% url 'login' %}" >Already have an account?</a>
+    </form>
+
+    <div class="container">
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <!-- Alert message will be inserted here -->
+                <div id="alertContainer" class="text-center"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    var signupForm = document.getElementById('signupForm');
+    signupForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Get username, password, and password confirmation values
+        var username = document.getElementById('username').value.trim();
+        var password = document.getElementById('password').value.trim();
+        var password2 = document.getElementById('password2').value.trim();
+
+        // Check if any field is empty
+        if (!username || !password || !password2) {
+            showAlert('alert-danger', 'Please enter both username and password');
+            return;
+        }
+
+        // Check if passwords match
+        if (password !== password2) {
+            showAlert('alert-danger', 'Passwords do not match');
+            return;
+        }
+
+        // Create form data
+        var formData = new FormData(signupForm);
+        console.log(formData);
+
+        // Send POST request
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.status === 'success') {
+                    window.location.href = '/home/';
+                } else {
+                    showAlert('alert-danger', 'Sign up failed. Please try again later.');
+                }
+            } else {
+                console.log(response);
+                showAlert('alert-danger', 'Username already exists. Please choose a different one.');
+            }
+        };
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.send(formData);
+    });
+});
+
+function showAlert(className, message) {
+    var alertContainer = document.getElementById('alertContainer');
+    var alertMessage = document.createElement('div');
+    alertMessage.className = 'alert ' + className;
+    alertMessage.textContent = message;
+    alertContainer.innerHTML = ''; // Clear previous alerts
+    alertContainer.appendChild(alertMessage);
+
+    // Automatically remove the alert after 3 seconds
+    setTimeout(function() {
+        alertContainer.innerHTML = '';
+    }, 3000);
+}
+
+
+
+            document.getElementById("togglePassword").addEventListener("click", function() {
+                var passwordField = document.getElementById("password");
+                var icon = document.getElementById("togglePassword");
+                if (passwordField.type === "password") {
+                    passwordField.type = "text";
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
+                } else {
+                    passwordField.type = "password";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                }
+            });
+            document.getElementById("togglePassword2").addEventListener("click", function() {
+                var passwordField = document.getElementById("password2");
+                var icon = document.getElementById("togglePassword2");
+                if (passwordField.type === "password") {
+                    passwordField.type = "text";
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
+                } else {
+                    passwordField.type = "password";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                }
+            });
+        </script>
+</html>

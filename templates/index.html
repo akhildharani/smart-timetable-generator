@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}  
+{% block content %}
+
+<div class="welcome">
+    <p>Welcome, {{ username }}!</p>
+</div>
+<div class="card">
+
+    <div class="txt">
+        <h2>Timetable Generator</h2> 
+    </div>
+    <div class="crdbtn">
+        <a href="javascript:void(0);" class="btn" id="generate-timetable">Generate Timetable</a>
+    </div>
+
+    <div id="loading-animation" style="display:none;">
+        <img src="{% static 'images/loading2.gif' %}" alt="Loading..." width="200" height="200" />
+    </div>
+
+</div>
+<script>
+document.getElementById('generate-timetable').onclick = function() {
+    document.getElementById('loading-animation').style.display = 'block'; // Show the loading animation
+    setTimeout(function() {
+        window.location.href = "{% url 'timetable' %}"; // Replace this with the actual URL to navigate after showing the loading animation
+    }, 2000); // Simulate a delay for the loading animation; adjust as needed
+};
+</script>
+{% endblock %}
